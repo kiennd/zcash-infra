@@ -64,3 +64,5 @@ shrinkdebugfile=1
 # Use your own custom checkpoint data
 checkblocks=24
 checklevel=4
+
+i-am-aware-zcashd-will-be-replaced-by-zebrad-and-zallet-in-2025=1
