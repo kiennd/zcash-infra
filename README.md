@@ -4,6 +4,12 @@ WARNING: zebra + zaino is not fully working, yet.
 An updated README will be provided to deploy more efficiently on different
 cloud providers and bare metal servers.
 
+The endgoal of this repository is to maintain an easy-to-deploy Zcash
+infrastructure using docker-compose and rely on Makefile targets.
+A setup using [cloud-init](https://cloudinit.readthedocs.io/en/latest/) is
+being developed to be used on different kind of servers, and get a "one-click"
+deployment.
+
 ## Table of Contents
 
 - [Environment Configuration](#environment-configuration)
@@ -43,10 +49,12 @@ All configuration settings are stored in the `.env` file, including:
 - Web UI configuration:
   - `CADDY_CONFIG_PATH`: The path to the Caddy configuration file
   - `GRAFANA_DOMAIN`: The domain name for Grafana (e.g., grafana.stakehold.rs)
-  - `GRAFANA_ROOT_URL`: The root URL for Grafana (e.g., https://grafana.stakehold.rs)
+  - `GRAFANA_ROOT_URL`: The root URL for Grafana (e.g.,
+    https://grafana.stakehold.rs)
   - `GRAFANA_SERVE_FROM_SUB_PATH`: Whether Grafana is served from a sub-path
 - Credentials and other sensitive configuration:
-  - `LIGHTWALLETD_RPC_USER`/`LIGHTWALLETD_RPC_PASSWORD`: For lightwalletd to connect to zcashd
+  - `LIGHTWALLETD_RPC_USER`/`LIGHTWALLETD_RPC_PASSWORD`: For lightwalletd to
+    connect to zcashd
   - `ZEBRA_RPC_USER`/`ZEBRA_RPC_PASSWORD`: For services to connect to Zebra
   - `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`: For Grafana admin login
 
@@ -59,7 +67,8 @@ Make sure to modify default values before deploying to production.
 The services are organized in separate Docker Compose files:
 
 1. `docker-compose.zcash.yml`: Contains zcashd and lightwalletd services
-2. `docker-compose.zebra.yml`: Contains zebra (Rust implementation) and zaino (indexer) services
+2. `docker-compose.zebra.yml`: Contains zebra (Rust implementation) and zaino
+   (indexer) services
    - Note: The Zaino image needs to be built manually before first use.
 
    **Zaino Build Workflow**:
@@ -160,7 +169,8 @@ exporter, and Grafana configured to monitor system and Zcash node resources.
 
 ### Setup Instructions
 
-1. Prepare the data directories (see [Data Directories Setup](#data-directories-setup)) - requires sudo privileges
+1. Prepare the data directories (see [Data Directories
+   Setup](#data-directories-setup)) - requires sudo privileges
 
 2. Start the monitoring stack:
 ```bash
@@ -234,8 +244,9 @@ for your environment.
 
 ### Example: Hetzner Server Setup
 
-If using a Hetzner server, the data disk is mounted automatically.
-You can see in the `/etc/fstab`:
+If using a Hetzner server, the data disk is not mounted automatically by
+default, and an entry in `/etc/fstab` must be added.
+For instance:
 
 ```shell
 # Data for zcashd and lightwalletd
@@ -268,7 +279,8 @@ sudo mkdir -p ${DATA_DIR}/zcashd_data
 sudo mkdir -p ${DATA_DIR}/lightwalletd_db_volume
 sudo mkdir -p ${DATA_DIR}/zebra_data
 sudo mkdir -p ${DATA_DIR}/zaino_data
-# Set ownership for lightwalletd (based on https://zcash.readthedocs.io/en/latest/rtd_pages/lightwalletd.html)
+# Set ownership for lightwalletd (based on
+# https://zcash.readthedocs.io/en/latest/rtd_pages/lightwalletd.html)
 sudo chown 2002 ${DATA_DIR}/lightwalletd_db_volume
 ```
 
@@ -276,12 +288,13 @@ sudo chown 2002 ${DATA_DIR}/lightwalletd_db_volume
 
 Template configuration files are provided for both node implementations:
 
-- **zcashd**: `zcash.conf.template` is copied to `${DATA_DIR}/zcashd_data/zcash.conf`
-  when running `make setup`, with RPC credentials automatically replaced from your `.env` file.
+- **zcashd**: `zcash.conf.template` is copied to
+  `${DATA_DIR}/zcashd_data/zcash.conf` when running `make setup`, with RPC
+  credentials automatically replaced from your `.env` file.
 
-- **zebra**: `zebra.toml.template` is copied to `${DATA_DIR}/zebra_data/zebra.toml`
-  when running `make setup`, with the external IP address automatically replaced from your
-  `.env` file.
+- **zebra**: `zebra.toml.template` is copied to
+  `${DATA_DIR}/zebra_data/zebra.toml` when running `make setup`, with the
+  external IP address automatically replaced from your `.env` file.
 
 The zcash.conf file includes:
 - Network configuration for external connectivity
@@ -291,7 +304,8 @@ The zcash.conf file includes:
 - Security settings
 - Useful debug configurations
 
-You can modify this file manually after setup if you need to fine-tune the configuration.
+You can modify this file manually after setup if you need to fine-tune the
+configuration.
 
 ### Caddy Web Server
 
