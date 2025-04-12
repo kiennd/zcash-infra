@@ -37,6 +37,7 @@ help:
 	@echo "  update-zaino-commit    Update docker-compose to use a specific Zaino commit (usage: make update-zaino-commit COMMIT=<hash>)"
 	@echo "  clean-zaino            Remove Zaino Docker image and build directory"
 	@echo "  clean                  Remove all containers and volumes (WARNING: destructive!)"
+	@echo "  clean-zcash            Remove Zcash containers and data volumes (WARNING: destructive!)"
 	@echo "  clean-networks         Remove all Docker networks (WARNING: destructive!)"
 	@echo "  clean-monitoring       Reset Prometheus and Grafana data (WARNING: destructive!)"
 	@echo "  help                   Show this help message"
@@ -152,14 +153,26 @@ status:
 	@echo "Service status:"
 	docker-compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml ps
 
+.PHONE: clean-zcash
+clean-zcash:
+	@echo "WARNING: This will remove all containers and volumes. Data may be lost!"
+	@echo "Press Ctrl+C now to abort, or wait 5 seconds to continue..."
+	@sleep 5
+
+	@echo "Revoming zcash services, including the directories"
+	docker-compose -f docker-compose.zcash.yml down -v
+	@echo "Delete Zcash directories..."
+	sudo rm -rf $(DATA_DIR)/zcashd_data
+	sudo rm -rf $(DATA_DIR)/lightwalletd_db_volume
+
 .PHONY: clean
-clean:
+clean: clean-zcash
 	@echo "WARNING: This will remove all containers and volumes. Data may be lost!"
 	@echo "Press Ctrl+C now to abort, or wait 5 seconds to continue..."
 	@sleep 5
 
 	@echo "Removing all services and volumes..."
-	docker-compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml down -v
+	docker-compose -f docker-compose.caddy.yml -f docker-compose.monitoring.yml down -v
 	@echo "Cleanup complete"
 
 .PHONY: clean-networks
