@@ -79,13 +79,13 @@ setup:
 
 .PHONY: start-all
 start-all:
-	@echo "Starting all services..."
+	@echo "Starting all services (zcash, caddy, monitoring)..."
 	docker-compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml up -d
 	@echo "All services started successfully"
 
 .PHONY: start-zcash
 start-zcash:
-	@echo "Starting Zcash services..."
+	@echo "Starting Zcash services (zcashd + lightwalletd)..."
 	docker-compose -f docker-compose.zcash.yml up -d
 	@echo "Zcash services started successfully"
 
@@ -110,7 +110,7 @@ start-caddy:
 
 .PHONY: start-monitoring
 start-monitoring:
-	@echo "Starting monitoring stack..."
+	@echo "Starting monitoring stack (Prometheus, Zcashd exporter, Node exporter, Grafana)..."
 	docker-compose -f docker-compose.monitoring.yml up -d
 	@echo "Monitoring stack started successfully"
 
