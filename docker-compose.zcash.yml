@@ -12,9 +12,6 @@ services:
       - ${DATA_DIR}/zcashd_data:/srv/zcashd/.zcash
     networks:
       - zcash-network
-    environment:
-      - ZCASH_NETWORK=${ZCASH_NETWORK}
-      - ZCASH_CONF_FILENAME=${ZCASH_CONF_FILENAME}
 
   lightwalletd:
     image: electriccoinco/lightwalletd:v0.4.17
