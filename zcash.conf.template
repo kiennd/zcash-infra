@@ -1,0 +1,65 @@
+# Zcash Configuration File (zcash.conf.template)
+# This file will be copied into zcash.conf when running `make start-zcash` and
+# the variables will be replaced by the ones listed in .env
+
+# Network Configuration
+# Enable serving to external connections
+listen=1
+
+# Bind to all interfaces to accept incoming connections
+bind=0.0.0.0
+
+# Allow JSON-RPC connections from all hosts
+rpcbind=0.0.0.0
+rpcallowip=0.0.0.0/0
+
+# RPC Authentication (use values from .env file)
+rpcuser=LIGHTWALLETD_RPC_USER
+rpcpassword=LIGHTWALLETD_RPC_PASSWORD
+
+# P2P Network Configuration
+# Maximum number of inbound+outbound connections
+maxconnections=125
+
+# Add some reliable seed nodes
+addnode=mainnet.z.cash
+addnode=dnsseed.z.cash
+addnode=dnsseed.str4d.xyz
+addnode=mainnet.seeder.zfnd.org
+
+# Performance Optimization
+# Database cache size in MB (adjust based on available RAM)
+dbcache=450
+
+# Maximum upload target in MB per day
+maxuploadtarget=1000
+
+# Socket receive/send buffer size
+maxreceivebuffer=2500
+maxsendbuffer=500
+
+# Transaction Index (required for block explorers)
+txindex=1
+
+# Wallet Options
+# Disables automatic wallet creation on startup if not exist
+disablewallet=0
+
+# Security Settings
+# Disables mining/staking operations
+gen=0
+
+# Include useful logging but avoid excessive output
+debug=mempool
+debug=net
+debug=rpc
+debug=tor
+debug=zrpc
+debug=zrpcunsafe=0
+
+# Limits maximum number of megabytes to log per day
+shrinkdebugfile=1
+
+# Use your own custom checkpoint data
+checkblocks=24
+checklevel=4
