@@ -51,10 +51,6 @@ setup:
 	sudo mkdir -p $(DATA_DIR)/lightwalletd_db_volume
 	sudo chown 2002 $(DATA_DIR)/lightwalletd_db_volume
 
-	@echo "Creating Zebra service directories..."
-	sudo mkdir -p $(DATA_DIR)/zebra_data
-	sudo mkdir -p $(DATA_DIR)/zaino_data
-
 	@echo "Setting up zcash.conf file if it doesn't exist..."
 	@if [ ! -f "$(DATA_DIR)/zcashd_data/zcash.conf" ]; then \
 		cp zcash.conf.template $(DATA_DIR)/zcashd_data/zcash.conf; \
@@ -63,15 +59,6 @@ setup:
 		echo "Created new zcash.conf file with proper credentials"; \
 	else \
 		echo "zcash.conf already exists, not modifying"; \
-	fi
-
-	@echo "Setting up zebra.toml file if it doesn't exist..."
-	@if [ ! -f "$(DATA_DIR)/zebra_data/zebra.toml" ]; then \
-		cp zebra.toml.template $(DATA_DIR)/zebra_data/zebra.toml; \
-		sed -i "s/EXTERNAL_IP/$(EXTERNAL_IP)/g" $(DATA_DIR)/zebra_data/zebra.toml; \
-		echo "Created new zebra.toml file with proper configuration"; \
-	else \
-		echo "zebra.toml already exists, not modifying"; \
 	fi
 
 	@echo "Creating Caddy directories..."
