@@ -48,9 +48,9 @@ All configuration settings are stored in the `.env` file, including:
   - `ZAINO_API_PORT`: API port for Zaino indexer (default: 8434)
 - Web UI configuration:
   - `CADDY_CONFIG_PATH`: The path to the Caddy configuration file
-  - `GRAFANA_DOMAIN`: The domain name for Grafana (e.g., grafana.stakehold.rs)
+  - `GRAFANA_DOMAIN`: The domain name for Grafana (e.g., foo.bar.com)
   - `GRAFANA_ROOT_URL`: The root URL for Grafana (e.g.,
-    https://grafana.stakehold.rs)
+    https://foo.bar.com)
   - `GRAFANA_SERVE_FROM_SUB_PATH`: Whether Grafana is served from a sub-path
 - Credentials and other sensitive configuration:
   - `LIGHTWALLETD_RPC_USER`/`LIGHTWALLETD_RPC_PASSWORD`: For lightwalletd to
@@ -177,7 +177,7 @@ exporter, and Grafana configured to monitor system and Zcash node resources.
 docker-compose -f docker-compose.monitoring.yml up -d
 ```
 
-3. Access Grafana at https://grafana.stakehold.rs
+3. Access Grafana at https://foo.bar.com
    - Login credentials are defined in the `.env` file
    - Prometheus data source is automatically configured
    - Node Exporter and Zcash dashboards are automatically provisioned
@@ -216,7 +216,7 @@ The setup includes automatic provisioning for Grafana:
 ### Security Notes
 
 - Prometheus and Node Exporter are only accessible within the Docker network
-- Only Grafana is exposed publicly through Caddy reverse proxy at grafana.stakehold.rs
+- Only Grafana is exposed publicly through Caddy reverse proxy at foo.bar.com
 - All sensitive credentials are stored in the `.env` file
 - Change all default credentials in the `.env` file for production deployments
 - Default credentials are provided only for development purposes
