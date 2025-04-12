@@ -49,7 +49,6 @@ All configuration settings are stored in the `.env` file, including:
   - `ZEBRA_RPC_PORT`: RPC port for Zebra (default: 8232)
   - `ZEBRA_P2P_PORT`: P2P port for Zebra (default: 8233)
   - `ZEBRA_METRICS_PORT`: Metrics port for Zebra (default: 3000)
-  - `ZAINO_GRPC`: GRPC port for Zaino indexer (default: 8434)
 - Web UI configuration:
   - `CADDY_CONFIG_PATH`: The path to the Caddy configuration file
   - `GRAFANA_DOMAIN`: The domain name for Grafana (e.g., foo.bar.com)
