@@ -1,6 +1,6 @@
 [network]
 network = "Mainnet"
-listen_addr = "0.0.0.0"
+listen_addr = "0.0.0.0:ZEBRA_P2P_PORT"
 
 [state]
 cache_dir = "/var/cache/zebrad-cache"
