@@ -423,8 +423,8 @@
     ]
   },
   "timezone": "",
-  "title": "Node Exporter Dashboard",
-  "uid": "rYdddlPWk",
+  "title": "Node Exporter - Summary",
+  "uid": "node-exporter-summary",
   "variables": {
     "list": []
   },
