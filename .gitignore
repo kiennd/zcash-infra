@@ -1,0 +1,7 @@
+Caddyfile
+caddy_data
+caddy_config
+tmp
+zebra.toml
+zindexer.toml
+.env
