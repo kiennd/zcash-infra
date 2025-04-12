@@ -20,7 +20,7 @@ help:
 	@echo "  setup                  Create all required directories and set permissions"
 	@echo "  start-all              Start all services (Zcash, Caddy, and monitoring)"
 	@echo "  start-zcash            Start Zcash services only (zcashd and lightwalletd)"
-		@echo "  start-zebra            Start Zebra services only (zebra and zaino)"
+	@echo "  start-zebra            Start Zebra services only (zebra and zaino)"
 	@echo "  start-caddy            Start Caddy web server only"
 	@echo "  start-monitoring       Start monitoring stack only (Prometheus, Node Exporter, Grafana)"
 	@echo "  stop-all               Stop all services"
