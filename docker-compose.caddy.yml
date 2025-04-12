@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${CADDY_CONFIG_PATH:-./Caddyfile}:/etc/caddy/Caddyfile:ro
+      - ${DATA_DIR}/caddy_data:/data
+      - ${DATA_DIR}/caddy_config:/config
+    networks:
+      - zcash-network
+    external_links:
+      - grafana
+      - lightwalletd
+    environment:
+      - CADDY_EMAIL=${CADDY_EMAIL}
+
+networks:
+  zcash-network:
+    external: true
