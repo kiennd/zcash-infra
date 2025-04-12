@@ -39,7 +39,7 @@ maxreceivebuffer=2500
 maxsendbuffer=500
 
 # Transaction Index (required for block explorers)
-txindex=1
+txindex=0
 
 # Wallet Options
 # Disables automatic wallet creation on startup if not exist
