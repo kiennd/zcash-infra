@@ -110,6 +110,7 @@ start-caddy:
 .PHONY: start-monitoring
 start-monitoring:
 	@echo "Starting monitoring stack (Prometheus, Zcashd exporter, Node exporter, Grafana)..."
+	docker-compose -f docker-compose.monitoring.yml pull
 	docker-compose -f docker-compose.monitoring.yml up -d
 	@echo "Monitoring stack started successfully"
 	@echo "You can run make check-zcash-exporter to verify that data are fetched from zcash"
