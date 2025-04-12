@@ -10,6 +10,8 @@ A setup using [cloud-init](https://cloudinit.readthedocs.io/en/latest/) is
 being developed to be used on different kind of servers, and get a "one-click"
 deployment.
 
+See [the roadmap](#roadmap) for more information.
+
 ![zcash grafana](./.img/grafana.jpeg)
 
 ## Table of Contents
@@ -331,3 +333,12 @@ sudo chown 65534:65534 ${DATA_DIR}/prometheus_data
 sudo chown -R 472:0 ${DATA_DIR}/grafana_data
 sudo chmod -R 755 ${DATA_DIR}/grafana_data
 ```
+
+## Roadmap
+
+- [ ] Provide cloud-init files
+- [ ] Provide different cloud providers setup instructions
+- [ ] Setting firewalls automatically
+- [ ] Integrate with one Internet scanner, like
+      [LeakIX](https://leakix.net) to detect misconfigurations and setting up
+      notifications for outdated/vulnerable infrastructure.
