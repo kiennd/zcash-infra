@@ -1,7 +1,7 @@
 caddy_data
 caddy_config
 tmp
-zebra.toml
+zebrad.toml
 zindexer.toml
 .env
 zcash.conf
