@@ -4,3 +4,4 @@ tmp
 zebra.toml
 zindexer.toml
 .env
+zcash.conf
