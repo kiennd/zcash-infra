@@ -8,7 +8,7 @@ providers:
     disableDeletion: false
     editable: true
     options:
-      path: /var/lib/grafana/dashboards
+      path: /var/lib/grafana/dashboards/node-exporter
 
   - name: 'Zcash Dashboards'
     orgId: 1
