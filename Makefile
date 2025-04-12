@@ -51,15 +51,13 @@ setup:
 	sudo mkdir -p $(DATA_DIR)/lightwalletd_db_volume
 	sudo chown 2002 $(DATA_DIR)/lightwalletd_db_volume
 
-	@echo "Setting up zcash.conf file if it doesn't exist..."
-	@if [ ! -f "$(DATA_DIR)/zcashd_data/zcash.conf" ]; then \
-		cp zcash.conf.template $(DATA_DIR)/zcashd_data/zcash.conf; \
-		sed -i "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" $(DATA_DIR)/zcashd_data/zcash.conf; \
-		sed -i "s/LIGHTWALLETD_RPC_PASSWORD/$(LIGHTWALLETD_RPC_PASSWORD)/g" $(DATA_DIR)/zcashd_data/zcash.conf; \
-		echo "Created new zcash.conf file with proper credentials"; \
-	else \
-		echo "zcash.conf already exists, not modifying"; \
-	fi
+	@echo "Setting up zcash.conf file (updating if necessary)"
+	cp zcash.conf.template zcash.conf; \
+	sed -i "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" zcash.conf; \
+	sed -i "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" zcash.conf; \
+	sed -i "s/LIGHTWALLETD_RPC_PASSWORD/$(LIGHTWALLETD_RPC_PASSWORD)/g" zcash.conf; \
+	echo "Created new zcash.conf file with proper credentials. Copying in $(DATA_DIR)/zcashd/zcash.conf"; \
+	sudo cp -f zcash.conf $(DATA_DIR)/zcashd_data/zcash.conf
 
 	@echo "Creating Caddy directories..."
 	sudo mkdir -p $(DATA_DIR)/caddy_data
