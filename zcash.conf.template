@@ -50,12 +50,13 @@ disablewallet=0
 gen=0
 
 # Include useful logging but avoid excessive output
-debug=mempool
-debug=net
-debug=rpc
-debug=tor
-debug=zrpc
-debug=zrpcunsafe=0
+# By default, commented as it is adding too much logging information
+#debug=mempool
+#debug=net
+#debug=rpc
+#debug=tor
+#debug=zrpc
+#debug=zrpcunsafe=0
 
 # Limits maximum number of megabytes to log per day
 shrinkdebugfile=1
