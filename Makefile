@@ -71,6 +71,10 @@ setup:
 	sudo chown -R 472:0 $(DATA_DIR)/grafana_data
 	sudo chmod -R 755 $(DATA_DIR)/grafana_data
 
+	@echo "Creating zebrad directories..."
+	sudo mkdir -p $(DATA_DIR)/zebrad-data
+	sudo chown -R 2001:2001 $(DATA_DIR)/zebrad-data
+
 	@echo "Creating Docker network..."
 	-docker network create zcash-network 2>/dev/null || true
 
@@ -90,13 +94,8 @@ start-zcash:
 
 .PHONY: start-zebra
 start-zebra:
-	@cp -f zebra.toml.template zebra.toml
-	sed -i "s/ZEBRA_P2P_PORT/$(ZEBRA_P2P_PORT)/g" zebra.toml
-	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebra.toml
-	sed -i "s/ZEBRA_METRICS_PORT/$(ZEBRA_METRICS_PORT)/g" zebra.toml
-	@cp -f zindexer.toml.template zindexer.toml
-	sed -i "s/ZAINO_GRPC_PORT/$(ZAINO_GRPC_PORT)/g" zindexer.toml
-	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zindexer.toml
+	@cp -f zebrad.toml.template zebrad.toml
+	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebrad.toml
 	@echo "Starting Zebra services..."
 	docker-compose -f docker-compose.zebra.yml up -d
 	@echo "Zebra services started successfully"
