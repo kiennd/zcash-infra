@@ -108,11 +108,8 @@ start-zcash:
 
 .PHONY: start-zebra
 start-zebra:
-	@cp -f zebrad.toml.template zebrad.toml
-	sed -i "s/ZEBRA_P2P_PORT/$(ZEBRA_P2P_PORT)/g" zebrad.toml
-	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebrad.toml
-	@echo "Starting Zebra services..."
-	docker-compose -f docker-compose.zebra.yml pull
+	@echo "Starting Zebra (zebrad + zaino) services..."
+	@echo "zebrad starts first, and zaino container might restart multiple times until zebrad is ready"
 	docker-compose -f docker-compose.zebra.yml up -d
 	@echo "Zebra services started successfully"
 
@@ -276,6 +273,9 @@ build-zaino:
 	@echo "Applying Dockerfile patch to use latest stable Rust version..."
 	@cd tmp/zaino && \
 	patch -p1 < ../../zaino-dockerfile-rust.patch || echo "Patch may have already been applied"
+	@echo "Applying Dockerfile patch to use compile with test_only_very_insecure to run behind Caddy..."
+	@cd tmp/zaino && \
+	patch -p1 < ../../zaino-dockerfile-tls.patch || echo "Patch may have already been applied"
 	@echo "Building Docker image (this may take a while)..."
 	@cd tmp/zaino && \
 	docker build -t zingolabs/zaino:latest .
@@ -302,6 +302,9 @@ build-zaino-commit:
 	@echo "Applying Dockerfile patch to use latest stable Rust version..."
 	@cd tmp/zaino && \
 	patch -p1 < ../../zaino-dockerfile-rust.patch || echo "Patch may have already been applied"
+	@echo "Applying Dockerfile patch to use compile with test_only_very_insecure to run behind Caddy..."
+	@cd tmp/zaino && \
+	patch -p1 < ../../zaino-dockerfile-tls.patch || echo "Patch may have already been applied"
 	@echo "Building Docker image (this may take a while)..."
 	@cd tmp/zaino && \
 	docker build -t zingolabs/zaino:$(COMMIT) .
