@@ -2,6 +2,6 @@ caddy_data
 caddy_config
 tmp
 zebrad.toml
-zindexer.toml
+zaino.toml
 .env
 zcash.conf
