@@ -65,6 +65,11 @@ setup:
 	sed -i "s/ZEBRA_P2P_PORT/$(ZEBRA_P2P_PORT)/g" zebrad.toml
 	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebrad.toml
 
+	@echo "Setting up zaino.toml (updating if necessary)"
+	@cp -f zaino.toml.template zaino.toml
+	sed -i "s/ZAINO_GRPC_PORT/$(ZAINO_GRPC_PORT)/g" zaino.toml
+	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zaino.toml
+
 	@echo "Creating Caddy directories..."
 	sudo mkdir -p $(DATA_DIR)/caddy_data
 	sudo mkdir -p $(DATA_DIR)/caddy_config
@@ -79,6 +84,10 @@ setup:
 	@echo "Creating zebrad directories..."
 	sudo mkdir -p $(DATA_DIR)/zebrad-data
 	sudo chown -R 2001:2001 $(DATA_DIR)/zebrad-data
+
+	@echo "Creating zaino directories..."
+	sudo mkdir -p $(DATA_DIR)/zaino-data
+	sudo chown -R 2003:2003 $(DATA_DIR)/zaino-data
 
 	@echo "Creating Docker network..."
 	-docker network create zcash-network 2>/dev/null || true
