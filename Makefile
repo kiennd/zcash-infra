@@ -60,6 +60,11 @@ setup:
 	echo "Created new zcash.conf file with proper credentials. Copying in $(DATA_DIR)/zcashd/zcash.conf"; \
 	sudo cp -f zcash.conf $(DATA_DIR)/zcashd_data/zcash.conf
 
+	@echo "Setting up zebrad.toml (updating if necessary)"
+	@cp -f zebrad.toml.template zebrad.toml
+	sed -i "s/ZEBRA_P2P_PORT/$(ZEBRA_P2P_PORT)/g" zebrad.toml
+	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebrad.toml
+
 	@echo "Creating Caddy directories..."
 	sudo mkdir -p $(DATA_DIR)/caddy_data
 	sudo mkdir -p $(DATA_DIR)/caddy_config
