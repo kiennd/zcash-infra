@@ -14,9 +14,6 @@ services:
       - ${DATA_DIR}/caddy_config:/config
     networks:
       - zcash-network
-    external_links:
-      - grafana
-      - lightwalletd
     environment:
       - CADDY_EMAIL=${CADDY_EMAIL}
 
