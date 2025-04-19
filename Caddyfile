@@ -11,6 +11,16 @@ lightwalletd.stakehold.rs {
 	}
 }
 
+zaino.stakehold.rs {
+	reverse_proxy zaino:8137 {
+		transport http {
+			# Speak HTTP/2 (h2c) to lightwalletd, which is running plaintext gRPC
+			versions h2c
+		}
+	}
+}
+
+
 grafana.stakehold.rs {
 	# Enable automatic HTTPS
 
