@@ -14,7 +14,7 @@ services:
       - zcash-network
 
   lightwalletd:
-    image: electriccoinco/lightwalletd:v0.4.17
+    image: electriccoinco/lightwalletd:v0.4.18
     container_name: lightwalletd
     restart: always
     depends_on:
