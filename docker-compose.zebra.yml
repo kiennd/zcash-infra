@@ -11,7 +11,7 @@ services:
       - "${ZEBRA_RPC_PORT:-8232}:8232"     # RPC port for API access (same as zcashd for compatibility)
       - "${ZEBRA_P2P_PORT:-8233}:8233"     # P2P port for peer connections
     volumes:
-      - ${DATA_DIR}/zebrad-cache:/var/cache/zebrad-cache
+      - ${DATA_DIR}/zebrad-cache:/home/zebra/.cache/zebra
       - ./zebrad.toml:/etc/zebrad/zebrad.toml:ro
     networks:
       - zcash-network
