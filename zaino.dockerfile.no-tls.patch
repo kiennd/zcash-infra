@@ -1,0 +1,35 @@
+diff --git a/Dockerfile b/Dockerfile
+index 513cfc6..ea50cb8 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -3,8 +3,6 @@
+ # Set the build arguments used across the stages.
+ # Each stage must define the build arguments (ARGs) it uses.
+ 
+-# Accept an argument to control no-tls builds
+-ARG NO_TLS=false
+ 
+ # High UID/GID (10003) to avoid overlap with host system users.
+ ARG UID=10003
+@@ -20,6 +18,10 @@ ARG RUST_VERSION=1.86.0
+ FROM rust:${RUST_VERSION}-bookworm AS deps
+ SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
+ 
++# Accept an argument to control no-tls builds
++ARG NO_TLS=false
++ENV NO_TLS=${NO_TLS:-false}
++
+ # Install build deps (if any beyond Rust).
+ RUN apt-get update && apt-get install -y --no-install-recommends \
+     musl-dev \
+@@ -46,6 +48,10 @@ ENV CARGO_TARGET_DIR=${CARGO_TARGET_DIR}
+ # This stage builds the zainod release binary.
+ FROM deps AS builder
+ 
++# Accept an argument to control no-tls builds
++ARG NO_TLS=false
++ENV NO_TLS=${NO_TLS:-false}
++
+ ARG HOME
+ WORKDIR ${HOME}
+ 
