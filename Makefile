@@ -270,9 +270,12 @@ build-zaino:
 		echo "Updating Zaino repository..."; \
 		cd tmp/zaino && git pull; \
 	fi
+	@echo "Applying Dockerfile patch to use compile with test_only_very_insecure to run behind Caddy..."
+	@cd tmp/zaino && \
+	patch -p1 < ../../zaino.dockerfile.no-tls.patch || echo "Patch may have already been applied"
 	@echo "Building Docker image (this may take a while)..."
 	@cd tmp/zaino && \
-	docker build -t zingolabs/zaino:latest --build-arg no-tls=true .
+	docker build -t zingolabs/zaino:latest --build-arg NO_TLS=true .
 	@echo "Zaino Docker image has been built successfully."
 	@echo "You can now start Zebra services with 'make start-zebra'"
 
@@ -291,11 +294,14 @@ build-zaino-commit:
 		echo "Repository already exists, fetching updates..."; \
 		cd tmp/zaino && git fetch; \
 	fi
+	@echo "Applying Dockerfile patch to use compile with test_only_very_insecure to run behind Caddy..."
+	@cd tmp/zaino && \
+	patch -p1 < ../../zaino-dockerfile-tls.patch || echo "Patch may have already been applied"
 	@echo "Checking out commit $(COMMIT)..."
 	@cd tmp/zaino && git checkout $(COMMIT)
 	@echo "Building Docker image (this may take a while)..."
 	@cd tmp/zaino && \
-	docker build -t zingolabs/zaino:$(COMMIT) --build-arg no-tls=true .
+	docker build -t zingolabs/zaino:$(COMMIT) --build-arg NO_TLS=true .
 	@echo "Zaino Docker image has been built successfully from commit $(COMMIT)."
 	@echo "To use this specific commit, run: make update-zaino-commit COMMIT=$(COMMIT)"
 	@echo "You can now start Zebra services with 'make start-zebra'"
