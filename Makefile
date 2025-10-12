@@ -18,6 +18,7 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  setup                  Create all required directories and set permissions"
+	@echo "  setup-env              Create .env file from template (run this first if you don't have .env)"
 	@echo "  start-all              Start all services (Zcash, Caddy, and monitoring)"
 	@echo "  start-zcash            Start Zcash services only (zcashd and lightwalletd)"
 	@echo "  start-zebra            Start Zebra services only (zebra and zaino) - builds Zaino from source first"
@@ -36,6 +37,7 @@ help:
 	@echo "  build-zaino-commit     Build Zaino from a specific commit (usage: make build-zaino-commit COMMIT=<hash>)"
 	@echo "  update-zaino-commit    Update docker-compose to use a specific Zaino commit (usage: make update-zaino-commit COMMIT=<hash>)"
 	@echo "  clean-zaino            Remove Zaino Docker image and build directory"
+	@echo "  clean-containers       Stop and remove all containers (safe cleanup)"
 	@echo "  clean                  Remove all containers and volumes (WARNING: destructive!)"
 	@echo "  clean-zcash            Remove Zcash containers and data volumes (WARNING: destructive!)"
 	@echo "  clean-networks         Remove all Docker networks (WARNING: destructive!)"
@@ -94,6 +96,18 @@ setup:
 
 	@echo "Setup complete! You can now start services with 'make start-all'"
 
+.PHONY: setup-env
+setup-env:
+	@echo "Setting up environment file..."
+	@if [ ! -f ".env" ]; then \
+		echo "Creating .env file from template..."; \
+		cp env.example .env; \
+		echo "Created .env file. Please edit it with your actual values before starting services."; \
+		echo "Important: Update DATA_DIR, passwords, and email addresses in .env"; \
+	else \
+		echo ".env file already exists. Skipping creation."; \
+	fi
+
 .PHONY: start-all
 start-all:
 	@echo "Starting all services (zcash, caddy, monitoring)..."
@@ -110,6 +124,8 @@ start-zcash:
 start-zebra: build-zaino
 	@echo "Starting Zebra (zebrad + zaino) services..."
 	@echo "Note: Zaino has been built from source. If you need a specific commit, use 'make build-zaino-commit COMMIT=<hash>' first."
+	@echo "Checking for existing containers and cleaning up if needed..."
+	@docker compose -f docker-compose.zebra.yml down 2>/dev/null || true
 	@echo "zebrad starts first, and zaino container might restart multiple times until zebrad is ready"
 	docker compose -f docker-compose.zebra.yml up -d
 	@echo "Zebra services started successfully"
@@ -271,9 +287,7 @@ build-zaino:
 		echo "Updating Zaino repository..."; \
 		cd tmp/zaino && git pull; \
 	fi
-	@echo "Applying Dockerfile patch to use compile with test_only_very_insecure to run behind Caddy..."
-	@cd tmp/zaino && \
-	patch -p1 < ../../zaino.dockerfile.no-tls.patch || echo "Patch may have already been applied"
+	@echo "Note: Zaino now has built-in NO_TLS support, no patch needed"
 	@echo "Building Docker image (this may take a while)..."
 	@cd tmp/zaino && \
 	docker build -t zingolabs/zaino:latest --build-arg NO_TLS=true .
@@ -295,9 +309,7 @@ build-zaino-commit:
 		echo "Repository already exists, fetching updates..."; \
 		cd tmp/zaino && git fetch; \
 	fi
-	@echo "Applying Dockerfile patch to use compile with test_only_very_insecure to run behind Caddy..."
-	@cd tmp/zaino && \
-	patch -p1 < ../../zaino.dockerfile.no-tls.patch || echo "Patch may have already been applied"
+	@echo "Note: Zaino now has built-in NO_TLS support, no patch needed"
 	@echo "Checking out commit $(COMMIT)..."
 	@cd tmp/zaino && git checkout $(COMMIT)
 	@echo "Building Docker image (this may take a while)..."
@@ -326,3 +338,18 @@ clean-zaino:
 	@echo "Removing Zaino build directory..."
 	-rm -rf tmp/zaino
 	@echo "Zaino cleanup complete."
+
+.PHONY: clean-containers
+clean-containers:
+	@echo "Stopping and removing all containers..."
+	@echo "This will stop all running containers but preserve volumes and data."
+	@echo "Press Ctrl+C now to abort, or wait 3 seconds to continue..."
+	@sleep 3
+	
+	@echo "Stopping all services..."
+	docker compose -f docker-compose.zcash.yml down 2>/dev/null || true
+	docker compose -f docker-compose.zebra.yml down 2>/dev/null || true
+	docker compose -f docker-compose.caddy.yml down 2>/dev/null || true
+	docker compose -f docker-compose.monitoring.yml down 2>/dev/null || true
+	
+	@echo "Container cleanup complete. Data volumes are preserved."
