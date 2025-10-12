@@ -64,13 +64,13 @@ setup:
 
 	@echo "Setting up zebrad.toml (updating if necessary)"
 	@cp -f zebrad.toml.template zebrad.toml
-	sed -i "s/ZEBRA_P2P_PORT/$(ZEBRA_P2P_PORT)/g" zebrad.toml
-	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebrad.toml
+	sed -i '' "s/ZEBRA_P2P_PORT/$(ZEBRA_P2P_PORT)/g" zebrad.toml
+	sed -i '' "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebrad.toml
 
 	@echo "Setting up zaino.toml (updating if necessary)"
 	@cp -f zaino.toml.template zaino.toml
-	sed -i "s/ZAINO_GRPC_PORT/$(ZAINO_GRPC_PORT)/g" zaino.toml
-	sed -i "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zaino.toml
+	sed -i '' "s/ZAINO_GRPC_PORT/$(ZAINO_GRPC_PORT)/g" zaino.toml
+	sed -i '' "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zaino.toml
 
 	@echo "Creating Caddy directories..."
 	sudo mkdir -p $(DATA_DIR)/caddy_data
