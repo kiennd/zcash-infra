@@ -9,6 +9,14 @@ endif
 # Default values if not defined in .env
 DATA_DIR ?= /media/data-disk
 
+# Detect operating system for sed compatibility
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+    SED_INPLACE = sed -i ''
+else
+    SED_INPLACE = sed -i
+endif
+
 .PHONY: help
 help:
 	@echo "Zcash Infrastructure Management"
@@ -56,21 +64,21 @@ setup:
 
 	@echo "Setting up zcash.conf file (updating if necessary)"
 	cp zcash.conf.template zcash.conf; \
-	sed -i "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" zcash.conf; \
-	sed -i "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" zcash.conf; \
-	sed -i "s/LIGHTWALLETD_RPC_PASSWORD/$(LIGHTWALLETD_RPC_PASSWORD)/g" zcash.conf; \
+	$(SED_INPLACE) "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" zcash.conf; \
+	$(SED_INPLACE) "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" zcash.conf; \
+	$(SED_INPLACE) "s/LIGHTWALLETD_RPC_PASSWORD/$(LIGHTWALLETD_RPC_PASSWORD)/g" zcash.conf; \
 	echo "Created new zcash.conf file with proper credentials. Copying in $(DATA_DIR)/zcashd/zcash.conf"; \
 	sudo cp -f zcash.conf $(DATA_DIR)/zcashd_data/zcash.conf
 
 	@echo "Setting up zebrad.toml (updating if necessary)"
 	@cp -f zebrad.toml.template zebrad.toml
-	@sed -i '' "s/ZEBRA_P2P_PORT/$(ZEBRA_P2P_PORT)/g" zebrad.toml
-	@sed -i '' "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebrad.toml
+	@$(SED_INPLACE) "s/ZEBRA_P2P_PORT/$(ZEBRA_P2P_PORT)/g" zebrad.toml
+	@$(SED_INPLACE) "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zebrad.toml
 
 	@echo "Setting up zaino.toml (updating if necessary)"
 	@cp -f zaino.toml.template zaino.toml
-	@sed -i '' "s/ZAINO_GRPC_PORT/$(ZAINO_GRPC_PORT)/g" zaino.toml
-	@sed -i '' "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zaino.toml
+	@$(SED_INPLACE) "s/ZAINO_GRPC_PORT/$(ZAINO_GRPC_PORT)/g" zaino.toml
+	@$(SED_INPLACE) "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zaino.toml
 
 	@echo "Creating Caddy directories..."
 	sudo mkdir -p $(DATA_DIR)/caddy_data
@@ -333,7 +341,7 @@ update-zaino-commit:
 		exit 1; \
 	fi
 	@echo "Updating docker-compose.zebra.yml to use Zaino commit $(COMMIT)..."
-	@sed -i 's|image: zingolabs/zaino:.*|image: zingolabs/zaino:$(COMMIT)  # Build with '\''make build-zaino-commit COMMIT=$(COMMIT)'\''|' docker-compose.zebra.yml
+	@$(SED_INPLACE) 's|image: zingolabs/zaino:.*|image: zingolabs/zaino:$(COMMIT)  # Build with '\''make build-zaino-commit COMMIT=$(COMMIT)'\''|' docker-compose.zebra.yml
 	@echo "Docker Compose configuration updated to use Zaino commit $(COMMIT)."
 	@echo "Run 'make start-zebra' to apply the changes."
 
