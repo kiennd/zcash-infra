@@ -111,36 +111,43 @@ setup-env:
 .PHONY: start-all
 start-all:
 	@echo "Starting all services (zcash, caddy, monitoring)..."
-	docker compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml up -d
+	docker compose --env-file .env -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml up -d
 	@echo "All services started successfully"
 
 .PHONY: start-zcash
 start-zcash:
 	@echo "Starting Zcash services (zcashd + lightwalletd)..."
-	docker compose -f docker-compose.zcash.yml up -d
+	docker compose --env-file .env -f docker-compose.zcash.yml up -d
 	@echo "Zcash services started successfully"
 
 .PHONY: start-zebra
 start-zebra: build-zaino
 	@echo "Starting Zebra (zebrad + zaino) services..."
 	@echo "Note: Zaino has been built from source. If you need a specific commit, use 'make build-zaino-commit COMMIT=<hash>' first."
+	@echo "Checking if setup has been completed..."
+	@if [ ! -d "$(DATA_DIR)" ]; then \
+		echo "ERROR: DATA_DIR directory '$(DATA_DIR)' does not exist."; \
+		echo "Please run 'make setup' first to create required directories."; \
+		echo "You may also need to update DATA_DIR in your .env file if using a different path."; \
+		exit 1; \
+	fi
 	@echo "Checking for existing containers and cleaning up if needed..."
 	@docker compose -f docker-compose.zebra.yml down 2>/dev/null || true
 	@echo "zebrad starts first, and zaino container might restart multiple times until zebrad is ready"
-	docker compose -f docker-compose.zebra.yml up -d
+	docker compose --env-file .env -f docker-compose.zebra.yml up -d
 	@echo "Zebra services started successfully"
 
 .PHONY: start-caddy
 start-caddy:
 	@echo "Starting Caddy web server..."
-	docker compose -f docker-compose.caddy.yml up -d
+	docker compose --env-file .env -f docker-compose.caddy.yml up -d
 	@echo "Caddy web server started successfully"
 
 .PHONY: start-monitoring
 start-monitoring:
 	@echo "Starting monitoring stack (Prometheus, Zcashd exporter, Node exporter, Grafana)..."
-	docker compose -f docker-compose.monitoring.yml pull
-	docker compose -f docker-compose.monitoring.yml up -d
+	docker compose --env-file .env -f docker-compose.monitoring.yml pull
+	docker compose --env-file .env -f docker-compose.monitoring.yml up -d
 	@echo "Monitoring stack started successfully"
 	@echo "You can run make check-zcash-exporter to verify that data are fetched from zcash"
 	@echo "You can visit http://localhost:3000/login to access Grafana and monitor the health of the node"

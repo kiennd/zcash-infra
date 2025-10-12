@@ -25,11 +25,10 @@ services:
       - "${ZAINO_GRPC_PORT:-8137}:8137"  # Zaino API port
     volumes:
       - ./zaino.toml:/etc/zaino/zaino.toml:ro
-      - ${DATA_DIR}/zaino-data/zaino-cache:/hoome/zaino/.cache/zaino
+      - ${DATA_DIR}/zaino-data/zaino-cache:/home/zaino/.cache/zaino
     networks:
       - zcash-network
-    command: >-
-      --config /etc/zaino/zaino.toml
+    command: ["zainod", "--config", "/etc/zaino/zaino.toml"]
 
 networks:
   zcash-network:
