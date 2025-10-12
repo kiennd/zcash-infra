@@ -20,7 +20,7 @@ help:
 	@echo "  setup                  Create all required directories and set permissions"
 	@echo "  start-all              Start all services (Zcash, Caddy, and monitoring)"
 	@echo "  start-zcash            Start Zcash services only (zcashd and lightwalletd)"
-	@echo "  start-zebra            Start Zebra services only (zebra and zaino)"
+	@echo "  start-zebra            Start Zebra services only (zebra and zaino) - builds Zaino from source first"
 	@echo "  start-caddy            Start Caddy web server only"
 	@echo "  start-monitoring       Start monitoring stack only (Prometheus, Node Exporter, Grafana)"
 	@echo "  stop-all               Stop all services"
@@ -107,8 +107,9 @@ start-zcash:
 	@echo "Zcash services started successfully"
 
 .PHONY: start-zebra
-start-zebra:
+start-zebra: build-zaino
 	@echo "Starting Zebra (zebrad + zaino) services..."
+	@echo "Note: Zaino has been built from source. If you need a specific commit, use 'make build-zaino-commit COMMIT=<hash>' first."
 	@echo "zebrad starts first, and zaino container might restart multiple times until zebrad is ready"
 	docker compose -f docker-compose.zebra.yml up -d
 	@echo "Zebra services started successfully"
@@ -296,7 +297,7 @@ build-zaino-commit:
 	fi
 	@echo "Applying Dockerfile patch to use compile with test_only_very_insecure to run behind Caddy..."
 	@cd tmp/zaino && \
-	patch -p1 < ../../zaino-dockerfile-tls.patch || echo "Patch may have already been applied"
+	patch -p1 < ../../zaino.dockerfile.no-tls.patch || echo "Patch may have already been applied"
 	@echo "Checking out commit $(COMMIT)..."
 	@cd tmp/zaino && git checkout $(COMMIT)
 	@echo "Building Docker image (this may take a while)..."

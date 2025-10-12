@@ -1,6 +1,5 @@
 # This docker-compose is inspired from
 # https://github.com/zecrocks/zcash-stack/blob/dcebc1e5a541dca634b3025d4910abf09b849a88/docker/docker-compose.zaino.yml
-version: '3.8'
 
 services:
   zebra:
