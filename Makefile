@@ -97,33 +97,33 @@ setup:
 .PHONY: start-all
 start-all:
 	@echo "Starting all services (zcash, caddy, monitoring)..."
-	docker-compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml up -d
+	docker compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml up -d
 	@echo "All services started successfully"
 
 .PHONY: start-zcash
 start-zcash:
 	@echo "Starting Zcash services (zcashd + lightwalletd)..."
-	docker-compose -f docker-compose.zcash.yml up -d
+	docker compose -f docker-compose.zcash.yml up -d
 	@echo "Zcash services started successfully"
 
 .PHONY: start-zebra
 start-zebra:
 	@echo "Starting Zebra (zebrad + zaino) services..."
 	@echo "zebrad starts first, and zaino container might restart multiple times until zebrad is ready"
-	docker-compose -f docker-compose.zebra.yml up -d
+	docker compose -f docker-compose.zebra.yml up -d
 	@echo "Zebra services started successfully"
 
 .PHONY: start-caddy
 start-caddy:
 	@echo "Starting Caddy web server..."
-	docker-compose -f docker-compose.caddy.yml up -d
+	docker compose -f docker-compose.caddy.yml up -d
 	@echo "Caddy web server started successfully"
 
 .PHONY: start-monitoring
 start-monitoring:
 	@echo "Starting monitoring stack (Prometheus, Zcashd exporter, Node exporter, Grafana)..."
-	docker-compose -f docker-compose.monitoring.yml pull
-	docker-compose -f docker-compose.monitoring.yml up -d
+	docker compose -f docker-compose.monitoring.yml pull
+	docker compose -f docker-compose.monitoring.yml up -d
 	@echo "Monitoring stack started successfully"
 	@echo "You can run make check-zcash-exporter to verify that data are fetched from zcash"
 	@echo "You can visit http://localhost:3000/login to access Grafana and monitor the health of the node"
@@ -131,51 +131,51 @@ start-monitoring:
 .PHONY: stop-all
 stop-all:
 	@echo "Stopping all services..."
-	docker-compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml down
+	docker compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml down
 	@echo "All services stopped successfully"
 
 .PHONY: stop-zcash
 stop-zcash:
 	@echo "Stopping Zcash services..."
-	docker-compose -f docker-compose.zcash.yml down
+	docker compose -f docker-compose.zcash.yml down
 	@echo "Zcash services stopped successfully"
 
 .PHONY: stop-zebra
 stop-zebra:
 	@echo "Stopping Zebra services..."
-	docker-compose -f docker-compose.zebra.yml down
+	docker compose -f docker-compose.zebra.yml down
 	@echo "Zebra services stopped successfully"
 
 .PHONY: stop-caddy
 stop-caddy:
 	@echo "Stopping Caddy web server..."
-	docker-compose -f docker-compose.caddy.yml down
+	docker compose -f docker-compose.caddy.yml down
 	@echo "Caddy web server stopped successfully"
 
 .PHONY: stop-monitoring
 stop-monitoring:
 	@echo "Stopping monitoring stack..."
-	docker-compose -f docker-compose.monitoring.yml down
+	docker compose -f docker-compose.monitoring.yml down
 	@echo "Monitoring stack stopped successfully"
 
 .PHONY: logs
 logs:
 	@echo "Showing logs for all services (press Ctrl+C to exit)..."
-	docker-compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml logs -f
+	docker compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml logs -f
 
 .PHONY: status
 status:
 	@echo "Service status:"
-	docker-compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml ps
+	docker compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml ps
 
-.PHONE: clean-zcash
+.PHONY: clean-zcash
 clean-zcash:
 	@echo "WARNING: This will remove all containers and volumes. Data may be lost!"
 	@echo "Press Ctrl+C now to abort, or wait 5 seconds to continue..."
 	@sleep 5
 
-	@echo "Revoming zcash services, including the directories"
-	docker-compose -f docker-compose.zcash.yml down -v
+	@echo "Removing zcash services, including the directories"
+	docker compose -f docker-compose.zcash.yml down -v
 	@echo "Delete Zcash directories..."
 	sudo rm -rf $(DATA_DIR)/zcashd_data
 	sudo rm -rf $(DATA_DIR)/lightwalletd_db_volume
@@ -187,7 +187,7 @@ clean: clean-zcash
 	@sleep 5
 
 	@echo "Removing all services and volumes..."
-	docker-compose -f docker-compose.caddy.yml -f docker-compose.monitoring.yml down -v
+	docker compose -f docker-compose.caddy.yml -f docker-compose.monitoring.yml down -v
 	@echo "Cleanup complete"
 
 .PHONY: clean-networks
@@ -224,7 +224,7 @@ clean-monitoring:
 	@sleep 5
 
 	@echo "Stopping monitoring services..."
-	docker-compose -f docker-compose.monitoring.yml down
+	docker compose -f docker-compose.monitoring.yml down
 
 	@echo "Removing Prometheus data..."
 	sudo rm -rf $(DATA_DIR)/prometheus_data/*
@@ -252,7 +252,7 @@ check-zcash-exporter:
 .PHONY: restart-zcash-exporter
 restart-zcash-exporter:
 	@echo "Restarting Zcash exporter container..."
-	docker-compose -f docker-compose.monitoring.yml restart zcash-exporter
+	docker compose -f docker-compose.monitoring.yml restart zcash-exporter
 	@echo "Waiting for exporter to initialize (5 seconds)..."
 	@sleep 5
 	@echo "Checking metrics endpoint:"
