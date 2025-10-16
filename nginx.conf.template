@@ -60,7 +60,7 @@ http {
         server_name _;
         
         location / {
-            return 200 'Zcash Infrastructure - Available services:\n- Zaino: http://ZAINO_DOMAIN\n- Grafana: http://GRAFANA_DOMAIN\n- RPC: http://RPC_DOMAIN\n';
+            return 200 '';
             add_header Content-Type text/plain;
         }
     }
@@ -144,6 +144,23 @@ http {
         limit_req zone=api burst=20 nodelay;
 
         location / {
+            # CORS headers for web access
+            add_header Access-Control-Allow-Origin "*" always;
+            add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With" always;
+            add_header Access-Control-Max-Age 86400 always;
+
+            # Handle preflight OPTIONS requests
+            if ($request_method = 'OPTIONS') {
+                add_header Access-Control-Allow-Origin "*" always;
+                add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+                add_header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With" always;
+                add_header Access-Control-Max-Age 86400 always;
+                add_header Content-Length 0;
+                add_header Content-Type text/plain;
+                return 204;
+            }
+
             proxy_pass http://zebra_rpc_backend;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
