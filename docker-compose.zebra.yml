@@ -3,7 +3,7 @@
 
 services:
   zebra:
-    image: zfnd/zebra:2.3.0
+    image: zfnd/zebra:2.5.0
     container_name: zebra
     restart: always
     ports:
