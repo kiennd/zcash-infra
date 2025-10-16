@@ -35,9 +35,9 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
 
-  zcash-exporter:
+  zebra-exporter:
     image: python:3.13-slim
-    container_name: zcash-exporter
+    container_name: zebra-exporter
     restart: always
     ports:
       - "9101:9101"
@@ -46,10 +46,10 @@ services:
     networks:
       - zcash-network
     environment:
-      - ZCASH_HOST=zcashd
+      - ZCASH_HOST=zebra
       - ZCASH_PORT=8232
-      - ZCASH_RPC_USER=${LIGHTWALLETD_RPC_USER}
-      - ZCASH_RPC_PASSWORD=${LIGHTWALLETD_RPC_PASSWORD}
+      - ZCASH_RPC_USER=${ZEBRA_RPC_USER}
+      - ZCASH_RPC_PASSWORD=${ZEBRA_RPC_PASSWORD}
       - EXPORTER_PORT=9101
       - REFRESH_INTERVAL=30
     command: >

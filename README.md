@@ -30,7 +30,7 @@ See [the roadmap](#roadmap) for more information.
 - [Service Data Directories Setup](#service-data-directories-setup)
   - [Zcash Services (zcashd & lightwalletd)](#zcash-services-zcashd--lightwalletd)
     - [Zcash Configuration](#zcash-configuration)
-  - [Caddy Web Server](#caddy-web-server)
+  - [Nginx Web Server](#nginx-web-server)
   - [Monitoring Services](#monitoring-services)
 
 ## Environment Configuration
@@ -41,23 +41,17 @@ All configuration settings are stored in the `.env` file, including:
 - Service configuration:
   - `ZCASH_NETWORK`: Network to connect to (mainnet, testnet, etc.)
   - `EXTERNAL_IP`: Your node's public IP address (for Zebra)
-  - `ZCASH_CONF_FILENAME`: Name of the Zcash configuration file
 - Port configuration (all optional with sensible defaults):
-  - `ZCASHD_RPC_PORT`: RPC port for zcashd (default: 8232)
-  - `ZCASHD_P2P_PORT`: P2P port for zcashd (default: 8233)
-  - `LIGHTWALLETD_PORT`: gRPC port for lightwalletd (default: 9067)
   - `ZEBRA_RPC_PORT`: RPC port for Zebra (default: 8232)
   - `ZEBRA_P2P_PORT`: P2P port for Zebra (default: 8233)
   - `ZEBRA_METRICS_PORT`: Metrics port for Zebra (default: 3000)
 - Web UI configuration:
-  - `CADDY_CONFIG_PATH`: The path to the Caddy configuration file
-  - `GRAFANA_DOMAIN`: The domain name for Grafana (e.g., foo.bar.com)
-  - `GRAFANA_ROOT_URL`: The root URL for Grafana (e.g.,
-    https://foo.bar.com)
+  - `NGINX_CONFIG_PATH`: The path to the Nginx configuration file
+  - `ZAINO_DOMAIN`: The domain name for Zaino (e.g., zaino.example.com)
+  - `GRAFANA_DOMAIN`: The domain name for Grafana (e.g., grafana.example.com)
+  - `GRAFANA_ROOT_URL`: The root URL for Grafana (e.g., http://grafana.example.com)
   - `GRAFANA_SERVE_FROM_SUB_PATH`: Whether Grafana is served from a sub-path
 - Credentials and other sensitive configuration:
-  - `LIGHTWALLETD_RPC_USER`/`LIGHTWALLETD_RPC_PASSWORD`: For lightwalletd to
-    connect to zcashd
   - `ZEBRA_RPC_USER`/`ZEBRA_RPC_PASSWORD`: For services to connect to Zebra
   - `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`: For Grafana admin login
 
@@ -69,8 +63,7 @@ Make sure to modify default values before deploying to production.
 
 The services are organized in separate Docker Compose files:
 
-1. `docker-compose.zcash.yml`: Contains zcashd and lightwalletd services
-2. `docker-compose.zebra.yml`: Contains zebra (Rust implementation) and zaino
+1. `docker-compose.zebra.yml`: Contains zebra (Rust implementation) and zaino
    (indexer) services
    - Note: The Zaino image needs to be built manually before first use.
 
@@ -108,8 +101,8 @@ The services are organized in separate Docker Compose files:
    # Start Zebra services with latest Zaino
    make start-zebra
    ```
-3. `docker-compose.caddy.yml`: Contains the Caddy web server
-4. `docker-compose.monitoring.yml`: Contains monitoring stack (Prometheus, Node
+2. `docker-compose.nginx.yml`: Contains the Nginx web server
+3. `docker-compose.monitoring.yml`: Contains monitoring stack (Prometheus, Node
    Exporter, Grafana)
 
 ### Running the Services
@@ -129,9 +122,8 @@ make setup
 make start-all
 
 # Start just specific components
-make start-zcash      # Start zcashd and lightwalletd
 make start-zebra      # Start zebra and zaino
-make start-caddy
+make start-nginx
 make start-monitoring
 
 # Check service status
@@ -149,26 +141,26 @@ make stop-all
 If you prefer to use Docker Compose commands directly:
 
 ```bash
-# Start Zcash services
-docker-compose -f docker-compose.zcash.yml up -d
+# Start Zebra services
+docker-compose -f docker-compose.zebra.yml up -d
 
-# Start Caddy web server
-docker-compose -f docker-compose.caddy.yml up -d
+# Start Nginx web server
+docker-compose -f docker-compose.nginx.yml up -d
 
 # Start monitoring stack
 docker-compose -f docker-compose.monitoring.yml up -d
 
 # Start all services together
-docker-compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml up -d
+docker-compose -f docker-compose.zebra.yml -f docker-compose.nginx.yml -f docker-compose.monitoring.yml up -d
 
 # Stop specific services
-docker-compose -f docker-compose.zcash.yml down
+docker-compose -f docker-compose.zebra.yml down
 ```
 
 ## Monitoring Setup
 
-The monitoring stack consists of Prometheus, Node Exporter, a custom Zcash
-exporter, and Grafana configured to monitor system and Zcash node resources.
+The monitoring stack consists of Prometheus, Node Exporter, a custom Zebra
+exporter, and Grafana configured to monitor system and Zebra node resources.
 
 ### Setup Instructions
 
@@ -183,12 +175,12 @@ docker-compose -f docker-compose.monitoring.yml up -d
 3. Access Grafana at https://foo.bar.com
    - Login credentials are defined in the `.env` file
    - Prometheus data source is automatically configured
-   - Node Exporter and Zcash dashboards are automatically provisioned
+   - Node Exporter and Zebra dashboards are automatically provisioned
 
-### Zcash Metrics
+### Zebra Metrics
 
-The infrastructure includes a custom Python-based Zcash metrics exporter
-(`scripts/zcash-exporter.py`) that collects data from the Zcash node via RPC
+The infrastructure includes a custom Python-based Zebra metrics exporter
+(`scripts/zcash-exporter.py`) that collects data from the Zebra node via RPC
 and exposes it in Prometheus format. The metrics include:
 
 - Block height and sync progress
@@ -199,7 +191,7 @@ and exposes it in Prometheus format. The metrics include:
 - Mempool statistics
 - Transaction metrics
 
-These metrics are visualized in the Zcash dashboard in Grafana, providing
+These metrics are visualized in the Zebra dashboard in Grafana, providing
 a comprehensive view of your node's performance and the network status.
 
 ### Automatic Dashboard Provisioning
@@ -208,7 +200,7 @@ The setup includes automatic provisioning for Grafana:
 - Prometheus data source is automatically added
 - A Node Exporter dashboard for monitoring CPU, memory, disk I/O, and network is
   included
-- A Zcash dashboard for monitoring blockchain and node metrics including:
+- A Zebra dashboard for monitoring blockchain and node metrics including:
   - Block height and sync progress
   - Network difficulty and hashrate
   - Peer connections and mempool statistics
@@ -219,7 +211,7 @@ The setup includes automatic provisioning for Grafana:
 ### Security Notes
 
 - Prometheus and Node Exporter are only accessible within the Docker network
-- Only Grafana is exposed publicly through Caddy reverse proxy at foo.bar.com
+- Only Grafana is exposed publicly through Nginx reverse proxy at foo.bar.com
 - All sensitive credentials are stored in the `.env` file
 - Change all default credentials in the `.env` file for production deployments
 - Default credentials are provided only for development purposes
@@ -274,32 +266,23 @@ Before starting services, you'll need to create and set proper permissions for
 all data directories. Most of these commands require sudo privileges, especially
 if the DATA_DIR is in a system location or has restricted permissions:
 
-### Zcash Services (zcashd, lightwalletd, zebra & zaino)
+### Zebra Services (zebra & zaino)
 
 ```bash
 # Replace DATA_DIR with your actual data directory path from .env
-sudo mkdir -p ${DATA_DIR}/zcashd_data
-sudo mkdir -p ${DATA_DIR}/lightwalletd_db_volume
-sudo mkdir -p ${DATA_DIR}/zebra_data
-sudo mkdir -p ${DATA_DIR}/zaino_data
-# Set ownership for lightwalletd (based on
-# https://zcash.readthedocs.io/en/latest/rtd_pages/lightwalletd.html)
-sudo chown 2002 ${DATA_DIR}/lightwalletd_db_volume
+sudo mkdir -p ${DATA_DIR}/zebrad-cache
+sudo mkdir -p ${DATA_DIR}/zaino-data
 ```
 
-#### Zcash and Zebra Configuration
+#### Zebra Configuration
 
-Template configuration files are provided for both node implementations:
+Template configuration files are provided for Zebra:
 
-- **zcashd**: `zcash.conf.template` is copied to
-  `${DATA_DIR}/zcashd_data/zcash.conf` when running `make setup`, with RPC
-  credentials automatically replaced from your `.env` file.
-
-- **zebra**: `zebra.toml.template` is copied to
-  `${DATA_DIR}/zebra_data/zebra.toml` when running `make setup`, with the
+- **zebra**: `zebrad.toml.template` is copied to
+  `zebrad.toml` when running `make setup`, with the
   external IP address automatically replaced from your `.env` file.
 
-The zcash.conf file includes:
+The zebrad.toml file includes:
 - Network configuration for external connectivity
 - RPC authentication settings
 - Performance optimizations
@@ -310,15 +293,20 @@ The zcash.conf file includes:
 You can modify this file manually after setup if you need to fine-tune the
 configuration.
 
-### Caddy Web Server
+### Nginx Web Server
 
 ```bash
-# Create directories for Caddy
-sudo mkdir -p ${DATA_DIR}/caddy_data
-sudo mkdir -p ${DATA_DIR}/caddy_config
-# You may need to set permissions if Caddy has permission issues
-# sudo chown -R 1000:1000 ${DATA_DIR}/caddy_data ${DATA_DIR}/caddy_config
+# Create directories for Nginx
+sudo mkdir -p ${DATA_DIR}/nginx_logs
 ```
+
+**HTTP Configuration**: The Nginx configuration is set up to serve HTTP only (no HTTPS/SSL). This simplifies the setup and is suitable for internal networks or development environments.
+
+**Domain Configuration**: The Nginx configuration is generated from a template (`nginx.conf.template`) during the `make setup` process. The domains are configured via environment variables:
+- `ZAINO_DOMAIN`: Domain for the Zaino service
+- `GRAFANA_DOMAIN`: Domain for the Grafana service
+
+The template is automatically processed to replace domain placeholders with your configured values.
 
 ### Monitoring Services
 

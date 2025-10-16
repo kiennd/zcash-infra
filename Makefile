@@ -27,48 +27,35 @@ help:
 	@echo "Targets:"
 	@echo "  setup                  Create all required directories and set permissions"
 	@echo "  setup-env              Create .env file from template (run this first if you don't have .env)"
-	@echo "  start-all              Start all services (Zcash, Caddy, and monitoring)"
-	@echo "  start-zcash            Start Zcash services only (zcashd and lightwalletd)"
+	@echo "  start-all              Start all services (Zebra, Nginx, and monitoring)"
 	@echo "  start-zebra            Start Zebra services only (zebra and zaino) - builds Zaino from source first"
-	@echo "  start-caddy            Start Caddy web server only"
+	@echo "  start-nginx            Start Nginx web server only"
 	@echo "  start-monitoring       Start monitoring stack only (Prometheus, Node Exporter, Grafana)"
 	@echo "  stop-all               Stop all services"
-	@echo "  stop-zcash             Stop Zcash services only"
 	@echo "  stop-zebra             Stop Zebra services only"
-	@echo "  stop-caddy             Stop Caddy web server only"
+	@echo "  stop-nginx             Stop Nginx web server only"
 	@echo "  stop-monitoring        Stop monitoring stack only"
 	@echo "  logs                   Show logs for all services"
 	@echo "  status                 Check status of all services"
-	@echo "  check-zcash-exporter   Verify the Zcash metrics exporter is working"
-	@echo "  restart-zcash-exporter Restart the Zcash metrics exporter container"
+	@echo "  check-zebra-exporter   Verify the Zebra metrics exporter is working"
+	@echo "  restart-zebra-exporter Restart the Zebra metrics exporter container"
 	@echo "  build-zaino            Build the Zaino Docker image from source (latest version)"
 	@echo "  build-zaino-commit     Build Zaino from a specific commit (usage: make build-zaino-commit COMMIT=<hash>)"
 	@echo "  update-zaino-commit    Update docker-compose to use a specific Zaino commit (usage: make update-zaino-commit COMMIT=<hash>)"
 	@echo "  clean-zaino            Remove Zaino Docker image and build directory"
 	@echo "  clean-containers       Stop and remove all containers (safe cleanup)"
 	@echo "  clean                  Remove all containers and volumes (WARNING: destructive!)"
-	@echo "  clean-zcash            Remove Zcash containers and data volumes (WARNING: destructive!)"
+	@echo "  clean-zebra            Remove Zebra containers and data volumes (WARNING: destructive!)"
 	@echo "  clean-networks         Remove all Docker networks (WARNING: destructive!)"
 	@echo "  clean-monitoring       Reset Prometheus and Grafana data (WARNING: destructive!)"
 	@echo "  help                   Show this help message"
 
 .PHONY: setup
 setup:
-	@echo "Setting up directories and permissions for Zcash infrastructure..."
+	@echo "Setting up directories and permissions for Zebra infrastructure..."
 	@echo "Using DATA_DIR: $(DATA_DIR)"
 
-	@echo "Creating Zcash service directories..."
-	sudo mkdir -p $(DATA_DIR)/zcashd_data
-	sudo mkdir -p $(DATA_DIR)/lightwalletd_db_volume
-	sudo chown 2002 $(DATA_DIR)/lightwalletd_db_volume
-
-	@echo "Setting up zcash.conf file (updating if necessary)"
-	cp zcash.conf.template zcash.conf; \
-	$(SED_INPLACE) "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" zcash.conf; \
-	$(SED_INPLACE) "s/LIGHTWALLETD_RPC_USER/$(LIGHTWALLETD_RPC_USER)/g" zcash.conf; \
-	$(SED_INPLACE) "s/LIGHTWALLETD_RPC_PASSWORD/$(LIGHTWALLETD_RPC_PASSWORD)/g" zcash.conf; \
-	echo "Created new zcash.conf file with proper credentials. Copying in $(DATA_DIR)/zcashd/zcash.conf"; \
-	sudo cp -f zcash.conf $(DATA_DIR)/zcashd_data/zcash.conf
+	@echo "Creating Zebra service directories..."
 
 	@echo "Setting up zebrad.toml (updating if necessary)"
 	@cp -f zebrad.toml.template zebrad.toml
@@ -80,9 +67,13 @@ setup:
 	@$(SED_INPLACE) "s/ZAINO_GRPC_PORT/$(ZAINO_GRPC_PORT)/g" zaino.toml
 	@$(SED_INPLACE) "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" zaino.toml
 
-	@echo "Creating Caddy directories..."
-	sudo mkdir -p $(DATA_DIR)/caddy_data
-	sudo mkdir -p $(DATA_DIR)/caddy_config
+	@echo "Setting up nginx.conf (updating if necessary)"
+	@cp -f nginx.conf.template nginx.conf
+	@$(SED_INPLACE) "s/ZAINO_DOMAIN/$(ZAINO_DOMAIN)/g" nginx.conf
+	@$(SED_INPLACE) "s/GRAFANA_DOMAIN/$(GRAFANA_DOMAIN)/g" nginx.conf
+
+	@echo "Creating Nginx directories..."
+	sudo mkdir -p $(DATA_DIR)/nginx_logs
 
 	@echo "Creating monitoring directories..."
 	sudo mkdir -p $(DATA_DIR)/prometheus_data
@@ -118,15 +109,9 @@ setup-env:
 
 .PHONY: start-all
 start-all:
-	@echo "Starting all services (zcash, caddy, monitoring)..."
-	docker compose --env-file .env -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml up -d
+	@echo "Starting all services (zebra, nginx, monitoring)..."
+	docker compose --env-file .env -f docker-compose.zebra.yml -f docker-compose.nginx.yml -f docker-compose.monitoring.yml up -d
 	@echo "All services started successfully"
-
-.PHONY: start-zcash
-start-zcash:
-	@echo "Starting Zcash services (zcashd + lightwalletd)..."
-	docker compose --env-file .env -f docker-compose.zcash.yml up -d
-	@echo "Zcash services started successfully"
 
 .PHONY: start-zebra
 start-zebra: build-zaino
@@ -145,32 +130,26 @@ start-zebra: build-zaino
 	docker compose --env-file .env -f docker-compose.zebra.yml up -d
 	@echo "Zebra services started successfully"
 
-.PHONY: start-caddy
-start-caddy:
-	@echo "Starting Caddy web server..."
-	docker compose --env-file .env -f docker-compose.caddy.yml up -d
-	@echo "Caddy web server started successfully"
+.PHONY: start-nginx
+start-nginx:
+	@echo "Starting Nginx web server..."
+	docker compose --env-file .env -f docker-compose.nginx.yml up -d
+	@echo "Nginx web server started successfully"
 
 .PHONY: start-monitoring
 start-monitoring:
-	@echo "Starting monitoring stack (Prometheus, Zcashd exporter, Node exporter, Grafana)..."
+	@echo "Starting monitoring stack (Prometheus, Zebra exporter, Node exporter, Grafana)..."
 	docker compose --env-file .env -f docker-compose.monitoring.yml pull
 	docker compose --env-file .env -f docker-compose.monitoring.yml up -d
 	@echo "Monitoring stack started successfully"
-	@echo "You can run make check-zcash-exporter to verify that data are fetched from zcash"
+	@echo "You can run make check-zebra-exporter to verify that data are fetched from zebra"
 	@echo "You can visit http://localhost:3000/login to access Grafana and monitor the health of the node"
 
 .PHONY: stop-all
 stop-all:
 	@echo "Stopping all services..."
-	docker compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml down
+	docker compose -f docker-compose.zebra.yml -f docker-compose.nginx.yml -f docker-compose.monitoring.yml down
 	@echo "All services stopped successfully"
-
-.PHONY: stop-zcash
-stop-zcash:
-	@echo "Stopping Zcash services..."
-	docker compose -f docker-compose.zcash.yml down
-	@echo "Zcash services stopped successfully"
 
 .PHONY: stop-zebra
 stop-zebra:
@@ -178,11 +157,11 @@ stop-zebra:
 	docker compose -f docker-compose.zebra.yml down
 	@echo "Zebra services stopped successfully"
 
-.PHONY: stop-caddy
-stop-caddy:
-	@echo "Stopping Caddy web server..."
-	docker compose -f docker-compose.caddy.yml down
-	@echo "Caddy web server stopped successfully"
+.PHONY: stop-nginx
+stop-nginx:
+	@echo "Stopping Nginx web server..."
+	docker compose -f docker-compose.nginx.yml down
+	@echo "Nginx web server stopped successfully"
 
 .PHONY: stop-monitoring
 stop-monitoring:
@@ -193,33 +172,33 @@ stop-monitoring:
 .PHONY: logs
 logs:
 	@echo "Showing logs for all services (press Ctrl+C to exit)..."
-	docker compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml logs -f
+	docker compose -f docker-compose.zebra.yml -f docker-compose.nginx.yml -f docker-compose.monitoring.yml logs -f
 
 .PHONY: status
 status:
 	@echo "Service status:"
-	docker compose -f docker-compose.zcash.yml -f docker-compose.caddy.yml -f docker-compose.monitoring.yml ps
+	docker compose -f docker-compose.zebra.yml -f docker-compose.nginx.yml -f docker-compose.monitoring.yml ps
 
-.PHONY: clean-zcash
-clean-zcash:
+.PHONY: clean-zebra
+clean-zebra:
 	@echo "WARNING: This will remove all containers and volumes. Data may be lost!"
 	@echo "Press Ctrl+C now to abort, or wait 5 seconds to continue..."
 	@sleep 5
 
-	@echo "Removing zcash services, including the directories"
-	docker compose -f docker-compose.zcash.yml down -v
-	@echo "Delete Zcash directories..."
-	sudo rm -rf $(DATA_DIR)/zcashd_data
-	sudo rm -rf $(DATA_DIR)/lightwalletd_db_volume
+	@echo "Removing zebra services, including the directories"
+	docker compose -f docker-compose.zebra.yml down -v
+	@echo "Delete Zebra directories..."
+	sudo rm -rf $(DATA_DIR)/zebrad-cache
+	sudo rm -rf $(DATA_DIR)/zaino-data
 
 .PHONY: clean
-clean: clean-zcash
+clean: clean-zebra
 	@echo "WARNING: This will remove all containers and volumes. Data may be lost!"
 	@echo "Press Ctrl+C now to abort, or wait 5 seconds to continue..."
 	@sleep 5
 
 	@echo "Removing all services and volumes..."
-	docker compose -f docker-compose.caddy.yml -f docker-compose.monitoring.yml down -v
+	docker compose -f docker-compose.zebra.yml -f docker-compose.nginx.yml -f docker-compose.monitoring.yml down -v
 	@echo "Cleanup complete"
 
 .PHONY: clean-networks
@@ -274,22 +253,22 @@ clean-monitoring:
 	@echo "Monitoring data has been cleaned."
 	@echo "You can restart the monitoring services with 'make start-monitoring'"
 
-.PHONY: check-zcash-exporter
-check-zcash-exporter:
-	@echo "Checking Zcash exporter metrics endpoint..."
-	@echo "This will show if the exporter is working and collecting metrics from the Zcash node."
-	@curl -s http://localhost:9101/metrics | grep zcash || { echo "Failed to get metrics - check if the zcash-exporter container is running"; exit 1; }
-	@echo "\nZcash exporter is working correctly and collecting metrics."
+.PHONY: check-zebra-exporter
+check-zebra-exporter:
+	@echo "Checking Zebra exporter metrics endpoint..."
+	@echo "This will show if the exporter is working and collecting metrics from the Zebra node."
+	@curl -s http://localhost:9101/metrics | grep zcash || { echo "Failed to get metrics - check if the zebra-exporter container is running"; exit 1; }
+	@echo "\nZebra exporter is working correctly and collecting metrics."
 
-.PHONY: restart-zcash-exporter
-restart-zcash-exporter:
-	@echo "Restarting Zcash exporter container..."
-	docker compose -f docker-compose.monitoring.yml restart zcash-exporter
+.PHONY: restart-zebra-exporter
+restart-zebra-exporter:
+	@echo "Restarting Zebra exporter container..."
+	docker compose -f docker-compose.monitoring.yml restart zebra-exporter
 	@echo "Waiting for exporter to initialize (5 seconds)..."
 	@sleep 5
 	@echo "Checking metrics endpoint:"
 	@curl -s http://localhost:9101/metrics | head -n 10
-	@echo "\nZcash exporter has been restarted."
+	@echo "\nZebra exporter has been restarted."
 
 .PHONY: build-zaino
 build-zaino:
@@ -362,9 +341,9 @@ clean-containers:
 	@sleep 3
 	
 	@echo "Stopping all services..."
-	docker compose -f docker-compose.zcash.yml down 2>/dev/null || true
 	docker compose -f docker-compose.zebra.yml down 2>/dev/null || true
-	docker compose -f docker-compose.caddy.yml down 2>/dev/null || true
+	docker compose -f docker-compose.nginx.yml down 2>/dev/null || true
 	docker compose -f docker-compose.monitoring.yml down 2>/dev/null || true
 	
 	@echo "Container cleanup complete. Data volumes are preserved."
+
