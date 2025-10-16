@@ -3,7 +3,7 @@ network = "Mainnet"
 listen_addr = "0.0.0.0:ZEBRA_P2P_PORT"
 
 [state]
-cache_dir = "/var/cache/zebrad-cache"
+cache_dir = "/home/zebra/.cache/zebra"
 
 [rpc]
 listen_addr = "0.0.0.0:ZEBRA_RPC_PORT"
