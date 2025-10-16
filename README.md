@@ -49,7 +49,8 @@ All configuration settings are stored in the `.env` file, including:
   - `NGINX_CONFIG_PATH`: The path to the Nginx configuration file
   - `ZAINO_DOMAIN`: The domain name for Zaino (e.g., zaino.example.com)
   - `GRAFANA_DOMAIN`: The domain name for Grafana (e.g., grafana.example.com)
-  - `GRAFANA_ROOT_URL`: The root URL for Grafana (e.g., http://grafana.example.com)
+  - `RPC_DOMAIN`: The domain name for Zebra RPC (e.g., rpc.example.com)
+  - `GRAFANA_ROOT_URL`: The root URL for Grafana (uses ${GRAFANA_DOMAIN} variable)
   - `GRAFANA_SERVE_FROM_SUB_PATH`: Whether Grafana is served from a sub-path
 - Credentials and other sensitive configuration:
   - `ZEBRA_RPC_USER`/`ZEBRA_RPC_PASSWORD`: For services to connect to Zebra
@@ -305,6 +306,7 @@ sudo mkdir -p ${DATA_DIR}/nginx_logs
 **Domain Configuration**: The Nginx configuration is generated from a template (`nginx.conf.template`) during the `make setup` process. The domains are configured via environment variables:
 - `ZAINO_DOMAIN`: Domain for the Zaino service
 - `GRAFANA_DOMAIN`: Domain for the Grafana service
+- `RPC_DOMAIN`: Domain for the Zebra RPC service
 
 The template is automatically processed to replace domain placeholders with your configured values.
 

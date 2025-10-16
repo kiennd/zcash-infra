@@ -71,6 +71,13 @@ setup:
 	@cp -f nginx.conf.template nginx.conf
 	@$(SED_INPLACE) "s/ZAINO_DOMAIN/$(ZAINO_DOMAIN)/g" nginx.conf
 	@$(SED_INPLACE) "s/GRAFANA_DOMAIN/$(GRAFANA_DOMAIN)/g" nginx.conf
+	@$(SED_INPLACE) "s/RPC_DOMAIN/$(RPC_DOMAIN)/g" nginx.conf
+	@$(SED_INPLACE) "s/ZEBRA_RPC_PORT/$(ZEBRA_RPC_PORT)/g" nginx.conf
+
+	@echo "Setting up .env file (updating if necessary)"
+	@if [ -f ".env" ]; then \
+		$(SED_INPLACE) "s/\$${GRAFANA_DOMAIN}/$(GRAFANA_DOMAIN)/g" .env; \
+	fi
 
 	@echo "Creating Nginx directories..."
 	sudo mkdir -p $(DATA_DIR)/nginx_logs
