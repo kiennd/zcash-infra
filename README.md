@@ -56,7 +56,7 @@ All configuration settings are stored in the `.env` file, including:
   - `ZEBRA_RPC_USER`/`ZEBRA_RPC_PASSWORD`: For services to connect to Zebra
   - `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`: For Grafana admin login
 
-See the `.env.template` file for a complete list of configurable parameters.
+See the `env.example` file for a complete list of configurable parameters.
 
 Make sure to modify default values before deploying to production.
 

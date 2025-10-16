@@ -140,6 +140,7 @@ start-zebra: build-zaino
 .PHONY: start-nginx
 start-nginx:
 	@echo "Starting Nginx web server..."
+	@echo "Note: Make sure Zebra and monitoring services are running first"
 	docker compose --env-file .env -f docker-compose.nginx.yml up -d
 	@echo "Nginx web server started successfully"
 

@@ -11,6 +11,7 @@ services:
     networks:
       - zcash-network
     depends_on:
+      - zebra
       - zaino
       - grafana
 
