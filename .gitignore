@@ -5,3 +5,4 @@ zebrad.toml
 zaino.toml
 .env
 zcash.conf
+nginx.conf

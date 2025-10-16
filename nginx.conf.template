@@ -54,6 +54,17 @@ http {
         server zebra:ZEBRA_RPC_PORT;
     }
 
+    # Default server block for unmatched requests
+    server {
+        listen 80 default_server;
+        server_name _;
+        
+        location / {
+            return 200 'Zcash Infrastructure - Available services:\n- Zaino: http://ZAINO_DOMAIN\n- Grafana: http://GRAFANA_DOMAIN\n- RPC: http://RPC_DOMAIN\n';
+            add_header Content-Type text/plain;
+        }
+    }
+
     # Zaino server
     server {
         listen 80;
