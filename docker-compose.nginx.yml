@@ -10,10 +10,6 @@ services:
       - ${DATA_DIR}/nginx_logs:/var/log/nginx
     networks:
       - zcash-network
-    depends_on:
-      - zebra
-      - zaino
-      - grafana
 
 networks:
   zcash-network:
