@@ -3,7 +3,7 @@
 
 services:
   zebra:
-    image: zfnd/zebra:2.5.0
+    image: kiennd8/zebra:latest
     container_name: zebra
     restart: always
     ports:
@@ -15,20 +15,20 @@ services:
     networks:
       - zcash-network
 
-  zaino:
-    image: zingolabs/zaino:latest  # Build with 'make build-zaino' or specify commit with 'make update-zaino-commit COMMIT=<hash>'
-    container_name: zaino
-    restart: always
-    depends_on:
-      - zebra
-    ports:
-      - "${ZAINO_GRPC_PORT:-8137}:8137"  # Zaino API port
-    volumes:
-      - ./zaino.toml:/etc/zaino/zaino.toml:ro
-      - ${DATA_DIR}/zaino-data/zaino-cache:/home/zaino/.cache/zaino
-    networks:
-      - zcash-network
-    command: ["zainod", "--config", "/etc/zaino/zaino.toml"]
+  # zaino:
+  #   image: zingolabs/zaino:latest  # Build with 'make build-zaino' or specify commit with 'make update-zaino-commit COMMIT=<hash>'
+  #   container_name: zaino
+  #   restart: always
+  #   depends_on:
+  #     - zebra
+  #   ports:
+  #     - "${ZAINO_GRPC_PORT:-8137}:8137"  # Zaino API port
+  #   volumes:
+  #     - ./zaino.toml:/etc/zaino/zaino.toml:ro
+  #     - ${DATA_DIR}/zaino-data/zaino-cache:/home/zaino/.cache/zaino
+  #   networks:
+  #     - zcash-network
+  #   command: ["zainod", "--config", "/etc/zaino/zaino.toml"]
 
 networks:
   zcash-network:

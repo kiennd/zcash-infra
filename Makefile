@@ -28,7 +28,7 @@ help:
 	@echo "  setup                  Create all required directories and set permissions"
 	@echo "  setup-env              Create .env file from template (run this first if you don't have .env)"
 	@echo "  start-all              Start all services (Zebra, Nginx, and monitoring)"
-	@echo "  start-zebra            Start Zebra services only (zebra and zaino) - builds Zaino from source first"
+	@echo "  start-zebra            Start Zebra services only (zebra and zaino) - requires Zaino image to exist"
 	@echo "  start-nginx            Start Nginx web server only"
 	@echo "  start-monitoring       Start monitoring stack only (Prometheus, Node Exporter, Grafana)"
 	@echo "  stop-all               Stop all services"
@@ -121,9 +121,9 @@ start-all:
 	@echo "All services started successfully"
 
 .PHONY: start-zebra
-start-zebra: build-zaino
+start-zebra:
 	@echo "Starting Zebra (zebrad + zaino) services..."
-	@echo "Note: Zaino has been built from source. If you need a specific commit, use 'make build-zaino-commit COMMIT=<hash>' first."
+	@echo "Note: Zaino image must already exist. If you need to build it, use 'make build-zaino' or 'make build-zaino-commit COMMIT=<hash>' first."
 	@echo "Checking if setup has been completed..."
 	@if [ ! -d "$(DATA_DIR)" ]; then \
 		echo "ERROR: DATA_DIR directory '$(DATA_DIR)' does not exist."; \
